@@ -37,40 +37,40 @@ npm create vue@latest my-vue-project
 cd my-vue-project
 npm install
 
-# 安装ESLint 9和相关插件
-npm install --save-dev eslint@^9.0.0 eslint-plugin-vue@^9.20.0 @vue/eslint-config-typescript@^13.0.0 @vue/eslint-config-prettier@^9.0.0 @typescript-eslint/eslint-plugin@^7.0.0 @typescript-eslint/parser@^7.0.0 globals@^14.0.0 @eslint/js
+# 安装ESLint 9和Vue官方配置 (最新版本)
+npm install --save-dev eslint@^9.21.0 eslint-plugin-vue@~10.0.0 @vue/eslint-config-typescript@^14.5.0 @vue/eslint-config-prettier@^10.2.0
+
+# 可选：安装性能优化工具
+npm install --save-dev oxlint@^0.15.13 eslint-plugin-oxlint@^0.15.13 npm-run-all2@^7.0.2
 ```
 
 #### 2. 复制配置文件 (2分钟)
 
-**ESLint配置 (ESLint 9)** - 创建 `eslint.config.js`:
+**ESLint配置 (Vue官方推荐)** - 创建 `eslint.config.js`:
 ```javascript
-import js from '@eslint/js'
-import vue from 'eslint-plugin-vue'
-import typescript from '@typescript-eslint/eslint-plugin'
-import typescriptParser from '@typescript-eslint/parser'
-import vueParser from 'vue-eslint-parser'
-import prettier from '@vue/eslint-config-prettier'
+import pluginVue from 'eslint-plugin-vue'
+import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
+import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 
-export default [
-  js.configs.recommended,
+export default defineConfigWithVueTs(
   {
-    files: ['**/*.vue'],
-    languageOptions: {
-      parser: vueParser,
-      parserOptions: { parser: typescriptParser }
-    },
-    plugins: { vue, '@typescript-eslint': typescript },
+    files: ['**/*.{ts,mts,tsx,vue}'],
+  },
+  {
+    ignores: ['**/dist/**', '**/coverage/**'],
+  },
+  pluginVue.configs['flat/essential'],
+  vueTsConfigs.recommended,
+  {
     rules: {
-      ...vue.configs['flat/recommended'].rules,
       'vue/multi-word-component-names': 'error',
       'vue/component-definition-name-casing': ['error', 'PascalCase'],
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     }
   },
-  prettier
-]
+  skipFormatting,
+)
 ```
 
 **Prettier配置** - 创建 `.prettierrc`:
@@ -460,19 +460,33 @@ const handleGetStarted = () => {
 ### 每次提交前检查
 
 ```bash
-# 1. 代码格式化和检查
-npm run lint:fix
+# 1. 快速代码检查和修复 (推荐先运行)
+npm run lint:oxlint
+
+# 2. 详细代码检查和修复
+npm run lint:eslint
+
+# 3. 或者运行所有lint工具
+npm run lint
+
+# 4. 代码格式化
 npm run format
 
-# 2. 类型检查
+# 5. 类型检查
 npm run type-check
 
-# 3. 运行测试
+# 6. 运行测试
 npm run test:unit
 
-# 4. 构建检查
+# 7. 构建检查
 npm run build
 ```
+
+### ⚡ 性能提示
+
+- **oxlint**: 极快的基础错误检查，建议在开发过程中频繁使用
+- **ESLint**: 详细的代码风格检查，适合提交前运行
+- **组合使用**: `npm run lint` 会按顺序运行所有检查工具
 
 ### 组件开发检查
 

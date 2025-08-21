@@ -848,90 +848,86 @@ export const useUserStore = defineStore('user', () => {
 
 > 🔧 **完整配置**: 查看 [TEMPLATES.md](./TEMPLATES.md) 获取所有配置文件模板
 
-### 📋 ESLint配置 (ESLint 9)
+### 📋 ESLint配置 (ESLint 9 + Vue官方推荐)
 
 <details>
-<summary><strong>📄 eslint.config.js - 代码质量检查配置 (扁平配置)</strong></summary>
+<summary><strong>📄 eslint.config.js - Vue官方推荐配置</strong></summary>
 
 ```javascript
-// 📄 eslint.config.js - ESLint 9 扁平配置
-import js from '@eslint/js'
-import vue from 'eslint-plugin-vue'
-import typescript from '@typescript-eslint/eslint-plugin'
-import typescriptParser from '@typescript-eslint/parser'
-import vueParser from 'vue-eslint-parser'
-import prettier from '@vue/eslint-config-prettier'
-import importPlugin from 'eslint-plugin-import'
-import globals from 'globals'
+// 📄 eslint.config.js - Vue官方推荐的ESLint 9配置
+import pluginVue from 'eslint-plugin-vue'
+import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
+import pluginVitest from '@vitest/eslint-plugin'
+import pluginPlaywright from 'eslint-plugin-playwright'
+import oxlint from 'eslint-plugin-oxlint'
+import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 
-export default [
-  // 🔧 基础JavaScript推荐规则
-  js.configs.recommended,
+export default defineConfigWithVueTs(
+  // 📁 指定要检查的文件
+  {
+    name: 'app/files-to-lint',
+    files: ['**/*.{ts,mts,tsx,vue}'],
+  },
   
-  // 🚫 全局忽略配置
+  // 🚫 指定要忽略的文件
   {
-    ignores: ['dist/', 'node_modules/', '*.min.js', 'coverage/']
+    name: 'app/files-to-ignore',
+    ignores: ['**/dist/**', '**/dist-ssr/**', '**/coverage/**'],
   },
 
-  // 🌐 基础配置 - 适用于所有文件
+  // 🎯 Vue基础配置
+  pluginVue.configs['flat/essential'],
+  
+  // 📘 TypeScript推荐配置
+  vueTsConfigs.recommended,
+
+  // 🧪 Vitest测试配置 (可选)
   {
-    languageOptions: {
-      globals: { ...globals.browser, ...globals.node, ...globals.es2022 },
-      ecmaVersion: 'latest',
-      sourceType: 'module'
-    },
-    plugins: { import: importPlugin },
-    rules: {
-      // 🔍 代码质量规则
-      'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-      'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-      'prefer-const': 'error',
-      'no-var': 'error',
-      
-      // 📦 导入规则
-      'import/order': ['error', {
-        'groups': ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
-        'newlines-between': 'always'
-      }]
-    }
+    ...pluginVitest.configs.recommended,
+    files: ['src/**/__tests__/*'],
   },
 
-  // 🎯 Vue文件配置
+  // 🎭 Playwright E2E测试配置 (可选)
   {
-    files: ['**/*.vue'],
-    languageOptions: {
-      parser: vueParser,
-      parserOptions: { parser: typescriptParser, ecmaVersion: 'latest', sourceType: 'module' }
-    },
-    plugins: { vue, '@typescript-eslint': typescript },
+    ...pluginPlaywright.configs['flat/recommended'],
+    files: ['e2e/**/*.{test,spec}.{js,ts,jsx,tsx}'],
+  },
+
+  // ⚡ Oxlint性能优化配置 (可选)
+  ...oxlint.configs['flat/recommended'],
+
+  // 🎨 Prettier格式化跳过配置 (必须放在最后)
+  skipFormatting,
+)
+```
+
+**自定义规则配置**:
+```javascript
+// 在上述配置基础上添加自定义规则
+export default defineConfigWithVueTs(
+  // ... 基础配置 ...
+  
+  // 🔧 自定义规则配置
+  {
+    name: 'app/custom-rules',
     rules: {
-      ...vue.configs['flat/recommended'].rules,
-      // 🎯 Vue相关规则
+      // 🎯 Vue规则
       'vue/multi-word-component-names': 'error',
       'vue/component-definition-name-casing': ['error', 'PascalCase'],
       'vue/component-name-in-template-casing': ['error', 'PascalCase'],
       
-      // 📘 TypeScript相关规则
+      // 📘 TypeScript规则
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-      '@typescript-eslint/explicit-function-return-type': 'off'
+      '@typescript-eslint/no-explicit-any': 'warn',
+      
+      // 🔍 代码质量规则
+      'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+      'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     }
   },
-
-  // 📘 TypeScript文件配置
-  {
-    files: ['**/*.ts', '**/*.tsx'],
-    languageOptions: { parser: typescriptParser },
-    plugins: { '@typescript-eslint': typescript },
-    rules: {
-      ...typescript.configs.recommended.rules,
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-      '@typescript-eslint/no-explicit-any': 'error'
-    }
-  },
-
-  // 🎨 Prettier集成 (必须放在最后)
-  prettier
-]
+  
+  skipFormatting,
+)
 ```
 
 </details>
@@ -1248,12 +1244,15 @@ console.log('debug info')       // 生产环境不应有console.log
 
 ### 更新日志
 
-- **v1.3.0** (2024-03-01): ⭐ **重大更新** - ESLint升级到v9
+- **v1.4.0** (2024-03-01): ⭐ **最新更新** - 同步Vue官方最新模板
+  - 🚀 **性能优化**: 集成oxlint高性能代码检查
+  - 📦 **依赖更新**: 同步Vue官方模板最新依赖版本
+  - 🔧 **脚本优化**: 采用npm-run-all2进行脚本管理
+  - ⚡ **开发体验**: oxlint + ESLint组合使用策略
+- **v1.3.0** (2024-03-01): ESLint升级到v9
   - 🔄 迁移到ESLint 9扁平配置格式
   - 📦 更新所有相关插件版本
   - 📖 添加详细的迁移指南
-  - 🚀 完善快速开始指南
-  - 📚 新增完整示例和索引导航
 - **v1.2.0** (2024-02-01): 完善测试规范
 - **v1.1.0** (2024-01-15): 添加TailwindCSS规范
 - **v1.0.0** (2024-01-01): 初始版本发布

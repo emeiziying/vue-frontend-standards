@@ -1,24 +1,43 @@
-# ESLint配置规范
+# ESLint 配置规范
 
 ## 概述
 
-ESLint是JavaScript和TypeScript代码质量检查工具，本规范定义了Vue项目中ESLint的配置标准、规则集和最佳实践。
+ESLint 是 JavaScript 和 TypeScript 代码质量检查工具，本规范定义了 Vue 项目中 ESLint 的配置标准、规则集和最佳实践。
 
 ## ESLint 9 新特性
 
 ESLint 9 引入了重要的变化，主要包括：
 
 ### 主要变化
+
 1. **扁平配置格式**: 使用 `eslint.config.js` 替代 `.eslintrc.js`
-2. **简化的CLI**: 不再需要指定文件扩展名
+2. **简化的 CLI**: 不再需要指定文件扩展名
 3. **更好的性能**: 配置解析和规则执行优化
-4. **Node.js 18+**: 最低要求Node.js 18.18.0或20.9.0
+4. **Node.js 18+**: 最低要求 Node.js 18.18.0 或 20.9.0
 
 ### 迁移要点
+
 - 配置文件从 `.eslintrc.js` 迁移到 `eslint.config.js`
-- 使用ES模块导入/导出语法
+- 使用 ES 模块导入/导出语法
 - 扁平化的配置结构，更直观的规则覆盖
-- 内置支持TypeScript和Vue文件类型检测
+- 内置支持 TypeScript 和 Vue 文件类型检测
+
+## 性能优化：Oxlint 集成
+
+Vue 官方模板现在集成了 oxlint，这是一个用 Rust 编写的高性能 linter：
+
+### Oxlint 优势
+
+- **极快的速度**: 比 ESLint 快 10-100 倍
+- **内存效率**: 更低的内存占用
+- **渐进式采用**: 可以与 ESLint 并行使用
+- **专注正确性**: 主要检查代码正确性问题
+
+### 使用策略
+
+1. **oxlint**: 快速检查基础错误和正确性问题
+2. **ESLint**: 详细的代码风格和最佳实践检查
+3. **组合使用**: 先运行 oxlint 快速修复，再运行 ESLint 进行详细检查
 
 ## 基础配置
 
@@ -26,191 +45,238 @@ ESLint 9 引入了重要的变化，主要包括：
 
 ```bash
 # 核心ESLint包 (v9.x)
-npm install --save-dev eslint@^9.0.0
+npm install --save-dev eslint@^9.21.0
 
-# Vue相关插件 (支持ESLint 9)
-npm install --save-dev eslint-plugin-vue@^9.20.0
-npm install --save-dev @vue/eslint-config-typescript@^13.0.0
-npm install --save-dev @vue/eslint-config-prettier@^9.0.0
+# Vue官方ESLint配置 (最新版本)
+npm install --save-dev eslint-plugin-vue@~10.0.0
+npm install --save-dev @vue/eslint-config-typescript@^14.5.0
+npm install --save-dev @vue/eslint-config-prettier@^10.2.0
 
-# TypeScript支持 (v7.x 支持ESLint 9)
-npm install --save-dev @typescript-eslint/eslint-plugin@^7.0.0
-npm install --save-dev @typescript-eslint/parser@^7.0.0
+# 测试相关ESLint插件 (推荐)
+npm install --save-dev @vitest/eslint-plugin@^1.1.36
+npm install --save-dev eslint-plugin-playwright@^2.2.0
 
-# 额外插件
-npm install --save-dev eslint-plugin-import@^2.29.0
-npm install --save-dev globals@^14.0.0
+# 性能优化插件 (推荐)
+npm install --save-dev eslint-plugin-oxlint@^0.15.13
+npm install --save-dev oxlint@^0.15.13
+
+# 构建工具
+npm install --save-dev npm-run-all2@^7.0.2
 ```
 
-### eslint.config.js 配置模板 (ESLint 9 扁平配置)
+### eslint.config.js 配置模板 (Vue 官方推荐)
+
+#### 基础配置 (推荐用于新项目)
 
 ```javascript
-import js from '@eslint/js'
-import vue from 'eslint-plugin-vue'
-import typescript from '@typescript-eslint/eslint-plugin'
-import typescriptParser from '@typescript-eslint/parser'
-import vueParser from 'vue-eslint-parser'
-import prettier from '@vue/eslint-config-prettier'
-import importPlugin from 'eslint-plugin-import'
-import globals from 'globals'
+import pluginVue from "eslint-plugin-vue";
+import {
+  defineConfigWithVueTs,
+  vueTsConfigs,
+} from "@vue/eslint-config-typescript";
+import pluginVitest from "@vitest/eslint-plugin";
+import pluginPlaywright from "eslint-plugin-playwright";
+import oxlint from "eslint-plugin-oxlint";
+import skipFormatting from "@vue/eslint-config-prettier/skip-formatting";
 
-export default [
-  // 基础JavaScript配置
-  js.configs.recommended,
-  
-  // 全局忽略配置
+// 如需支持Vue文件中的其他语言，取消注释以下行：
+// import { configureVueProject } from '@vue/eslint-config-typescript'
+// configureVueProject({ scriptLangs: ['ts', 'tsx'] })
+
+export default defineConfigWithVueTs(
+  // 指定要检查的文件
   {
-    ignores: [
-      'dist/',
-      'node_modules/',
-      '*.min.js',
-      'coverage/',
-      '.nuxt/',
-      '.output/',
-      '.vscode/',
-      '.idea/'
-    ]
+    name: "app/files-to-lint",
+    files: ["**/*.{ts,mts,tsx,vue}"],
   },
 
-  // 基础配置 - 适用于所有文件
+  // 指定要忽略的文件
   {
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-        ...globals.es2022
-      },
-      ecmaVersion: 'latest',
-      sourceType: 'module'
-    },
-    plugins: {
-      import: importPlugin
-    },
+    name: "app/files-to-ignore",
+    ignores: ["**/dist/**", "**/dist-ssr/**", "**/coverage/**"],
+  },
+
+  // Vue基础配置
+  pluginVue.configs["flat/essential"],
+
+  // TypeScript推荐配置
+  vueTsConfigs.recommended,
+
+  // Vitest测试配置
+  {
+    ...pluginVitest.configs.recommended,
+    files: ["src/**/__tests__/*"],
+  },
+
+  // Playwright E2E测试配置
+  {
+    ...pluginPlaywright.configs["flat/recommended"],
+    files: ["e2e/**/*.{test,spec}.{js,ts,jsx,tsx}"],
+  },
+
+  // Oxlint性能优化配置
+  ...oxlint.configs["flat/recommended"],
+
+  // Prettier格式化跳过配置 (必须放在最后)
+  skipFormatting
+);
+```
+
+#### 自定义规则配置
+
+```javascript
+import pluginVue from "eslint-plugin-vue";
+import {
+  defineConfigWithVueTs,
+  vueTsConfigs,
+} from "@vue/eslint-config-typescript";
+import skipFormatting from "@vue/eslint-config-prettier/skip-formatting";
+
+export default defineConfigWithVueTs(
+  {
+    name: "app/files-to-lint",
+    files: ["**/*.{ts,mts,tsx,vue}"],
+  },
+  {
+    name: "app/files-to-ignore",
+    ignores: ["**/dist/**", "**/dist-ssr/**", "**/coverage/**"],
+  },
+
+  // Vue推荐配置 (可选择 essential, recommended, strongly-recommended)
+  pluginVue.configs["flat/recommended"],
+
+  // TypeScript配置
+  vueTsConfigs.recommended,
+
+  // 自定义规则配置
+  {
+    name: "app/custom-rules",
     rules: {
+      // Vue规则配置
+      "vue/multi-word-component-names": "error",
+      "vue/component-definition-name-casing": ["error", "PascalCase"],
+      "vue/component-name-in-template-casing": ["error", "PascalCase"],
+      "vue/prop-name-casing": ["error", "camelCase"],
+      "vue/attribute-hyphenation": ["error", "always"],
+      "vue/v-on-event-hyphenation": ["error", "always"],
+      "vue/component-tags-order": [
+        "error",
+        {
+          order: ["template", "script", "style"],
+        },
+      ],
+      "vue/block-tag-newline": [
+        "error",
+        {
+          singleline: "always",
+          multiline: "always",
+        },
+      ],
+
+      // TypeScript规则配置
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+        },
+      ],
+      "@typescript-eslint/explicit-function-return-type": "off",
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/prefer-const": "error",
+      "@typescript-eslint/no-inferrable-types": "error",
+      "@typescript-eslint/prefer-nullish-coalescing": "error",
+      "@typescript-eslint/prefer-optional-chain": "error",
+
       // 通用JavaScript规则
-      'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-      'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-      'prefer-const': 'error',
-      'no-var': 'error',
-      'object-shorthand': 'error',
-      'prefer-template': 'error',
-      
-      // 导入规则
-      'import/order': ['error', {
-        'groups': [
-          'builtin',
-          'external',
-          'internal',
-          'parent',
-          'sibling',
-          'index'
-        ],
-        'newlines-between': 'always',
-        'alphabetize': {
-          'order': 'asc',
-          'caseInsensitive': true
-        }
-      }]
-    }
+      "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
+      "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
+      "prefer-const": "error",
+      "no-var": "error",
+      "object-shorthand": "error",
+      "prefer-template": "error",
+    },
+  },
+
+  // 测试文件特殊配置
+  {
+    name: "app/test-files",
+    files: ["**/__tests__/**/*", "**/*.{test,spec}.*"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "no-console": "off",
+      "vue/multi-word-component-names": "off",
+    },
+  },
+
+  // Prettier集成
+  skipFormatting
+);
+```
+
+#### 传统扁平配置 (兼容其他工具)
+
+```javascript
+import js from "@eslint/js";
+import pluginVue from "eslint-plugin-vue";
+import * as parserVue from "vue-eslint-parser";
+import configPrettier from "@vue/eslint-config-prettier/skip-formatting";
+import pluginTs from "@typescript-eslint/eslint-plugin";
+import * as parserTs from "@typescript-eslint/parser";
+
+export default [
+  {
+    name: "app/files-to-ignore",
+    ignores: ["**/dist/**", "**/dist-ssr/**", "**/coverage/**"],
+  },
+
+  // JavaScript基础配置
+  {
+    ...js.configs.recommended,
+    name: "app/js",
   },
 
   // Vue文件配置
   {
-    files: ['**/*.vue'],
+    ...pluginVue.configs["flat/recommended"],
+    files: ["**/*.vue"],
     languageOptions: {
-      parser: vueParser,
+      parser: parserVue,
       parserOptions: {
-        parser: typescriptParser,
-        ecmaVersion: 'latest',
-        sourceType: 'module'
-      }
+        parser: parserTs,
+        ecmaVersion: "latest",
+        sourceType: "module",
+      },
     },
-    plugins: {
-      vue,
-      '@typescript-eslint': typescript
-    },
-    rules: {
-      // Vue推荐规则
-      ...vue.configs['flat/recommended'].rules,
-      
-      // Vue规则配置
-      'vue/multi-word-component-names': 'error',
-      'vue/component-definition-name-casing': ['error', 'PascalCase'],
-      'vue/component-name-in-template-casing': ['error', 'PascalCase'],
-      'vue/prop-name-casing': ['error', 'camelCase'],
-      'vue/attribute-hyphenation': ['error', 'always'],
-      'vue/v-on-event-hyphenation': ['error', 'always'],
-      'vue/component-tags-order': ['error', {
-        'order': ['template', 'script', 'style']
-      }],
-      'vue/block-tag-newline': ['error', {
-        'singleline': 'always',
-        'multiline': 'always'
-      }],
-      
-      // TypeScript规则 (在Vue文件中)
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-      '@typescript-eslint/explicit-function-return-type': 'off',
-      '@typescript-eslint/explicit-module-boundary-types': 'off',
-      '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/prefer-const': 'error'
-    }
+    name: "app/vue",
   },
 
   // TypeScript文件配置
   {
-    files: ['**/*.ts', '**/*.tsx'],
+    files: ["**/*.{ts,tsx,mts,cts}"],
     languageOptions: {
-      parser: typescriptParser,
+      parser: parserTs,
       parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-        project: './tsconfig.json'
-      }
+        ecmaVersion: "latest",
+        sourceType: "module",
+      },
     },
     plugins: {
-      '@typescript-eslint': typescript
+      "@typescript-eslint": pluginTs,
     },
     rules: {
-      // TypeScript推荐规则
-      ...typescript.configs.recommended.rules,
-      
-      // TypeScript规则配置
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-      '@typescript-eslint/explicit-function-return-type': 'warn',
-      '@typescript-eslint/explicit-module-boundary-types': 'off',
-      '@typescript-eslint/no-explicit-any': 'error',
-      '@typescript-eslint/prefer-const': 'error',
-      '@typescript-eslint/no-inferrable-types': 'error',
-      '@typescript-eslint/prefer-nullish-coalescing': 'error',
-      '@typescript-eslint/prefer-optional-chain': 'error'
-    }
+      ...pluginTs.configs.recommended.rules,
+    },
+    name: "app/ts",
   },
 
-  // 测试文件配置
-  {
-    files: ['**/__tests__/**/*', '**/*.{test,spec}.*'],
-    rules: {
-      // 测试文件规则放宽
-      '@typescript-eslint/no-explicit-any': 'off',
-      'no-console': 'off',
-      'vue/multi-word-component-names': 'off'
-    }
-  },
-
-  // 配置文件规则
-  {
-    files: ['*.config.js', '*.config.ts', '*.config.mjs'],
-    rules: {
-      '@typescript-eslint/no-var-requires': 'off',
-      'import/no-commonjs': 'off'
-    }
-  },
-
-  // Prettier集成 (必须放在最后)
-  prettier
-]
+  // Prettier配置
+  configPrettier,
+];
 ```
+
+````
 
 ## Vue项目专用规则集
 
@@ -225,7 +291,7 @@ export default [
 'vue/require-default-prop': 'error',
 'vue/require-prop-types': 'error',
 'vue/prop-name-casing': ['error', 'camelCase'],
-```
+````
 
 ### 模板规则
 
@@ -262,13 +328,13 @@ export default [
 'vue/no-setup-props-destructure': 'error',
 ```
 
-## TypeScript集成配置
+## TypeScript 集成配置
 
-### 基础TypeScript规则
+### 基础 TypeScript 规则
 
 ```javascript
 // TypeScript核心规则
-'@typescript-eslint/no-unused-vars': ['error', { 
+'@typescript-eslint/no-unused-vars': ['error', {
   argsIgnorePattern: '^_',
   varsIgnorePattern: '^_'
 }],
@@ -322,42 +388,64 @@ export default [
 ```json
 {
   "scripts": {
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "lint:check": "eslint . --max-warnings 0"
+    "lint:oxlint": "oxlint . --fix -D correctness --ignore-path .gitignore",
+    "lint:eslint": "eslint . --fix",
+    "lint": "run-s lint:*",
+    "format": "prettier --write src/",
+    "type-check": "vue-tsc --build",
+    "build": "run-p type-check \"build-only {@}\" --",
+    "build-only": "vite build"
   }
 }
+```
+
+#### 脚本说明
+
+- **`lint:oxlint`**: 使用 oxlint 进行快速代码检查和修复
+- **`lint:eslint`**: 使用 ESLint 进行详细代码检查和修复
+- **`lint`**: 按顺序运行所有 lint 工具 (先 oxlint 后 eslint)
+- **`run-s`**: 串行运行脚本 (来自 npm-run-all2)
+- **`run-p`**: 并行运行脚本 (来自 npm-run-all2)
+
 ```
 
 ### .eslintignore 文件
 
 ```
+
 # 构建输出
+
 dist/
 build/
 coverage/
 
 # 依赖
+
 node_modules/
 
 # 配置文件
-*.config.js
-*.config.ts
+
+_.config.js
+_.config.ts
 
 # 生成文件
-*.min.js
-*.bundle.js
+
+_.min.js
+_.bundle.js
 
 # 临时文件
+
 .tmp/
 .cache/
 
-# IDE文件
+# IDE 文件
+
 .vscode/
 .idea/
-```
 
-## VS Code集成配置
+````
+
+## VS Code 集成配置
 
 ### .vscode/settings.json
 
@@ -379,79 +467,95 @@ node_modules/
   "eslint.lintTask.enable": true,
   "eslint.experimental.useFlatConfig": true
 }
-```
+````
 
 ## ESLint 8 到 9 迁移指南
 
 ### 1. 升级依赖
 
 ```bash
-# 卸载旧版本
+# 卸载旧版本 (如果存在)
 npm uninstall eslint @vue/eslint-config-vue @vue/eslint-config-typescript @vue/eslint-config-prettier
 
-# 安装ESLint 9兼容版本
+# 安装ESLint 9和Vue官方配置
 npm install --save-dev eslint@^9.0.0
 npm install --save-dev eslint-plugin-vue@^9.20.0
 npm install --save-dev @vue/eslint-config-typescript@^13.0.0
 npm install --save-dev @vue/eslint-config-prettier@^9.0.0
-npm install --save-dev @typescript-eslint/eslint-plugin@^7.0.0
-npm install --save-dev @typescript-eslint/parser@^7.0.0
-npm install --save-dev globals@^14.0.0
+
+# 可选：测试和性能优化插件
+npm install --save-dev @vitest/eslint-plugin@^1.0.0
+npm install --save-dev eslint-plugin-playwright@^1.0.0
+npm install --save-dev eslint-plugin-oxlint@^0.2.0
 ```
 
 ### 2. 配置文件迁移
 
 **旧配置 (.eslintrc.js)**:
+
 ```javascript
 module.exports = {
   root: true,
-  extends: ['eslint:recommended', '@vue/typescript/recommended'],
+  extends: ["eslint:recommended", "@vue/typescript/recommended"],
   // ...
-}
+};
 ```
 
-**新配置 (eslint.config.js)**:
-```javascript
-import js from '@eslint/js'
-import vue from 'eslint-plugin-vue'
+**新配置 (eslint.config.js) - Vue 官方推荐**:
 
-export default [
-  js.configs.recommended,
-  ...vue.configs['flat/recommended'],
-  // ...
-]
+```javascript
+import pluginVue from "eslint-plugin-vue";
+import {
+  defineConfigWithVueTs,
+  vueTsConfigs,
+} from "@vue/eslint-config-typescript";
+import skipFormatting from "@vue/eslint-config-prettier/skip-formatting";
+
+export default defineConfigWithVueTs(
+  {
+    files: ["**/*.{ts,mts,tsx,vue}"],
+  },
+  pluginVue.configs["flat/essential"],
+  vueTsConfigs.recommended,
+  skipFormatting
+);
 ```
 
 ### 3. 常见迁移问题
 
-#### 问题1: 配置不生效
+#### 问题 1: 配置不生效
+
 **解决方案**: 确保使用 `eslint.config.js` 文件名，并删除旧的 `.eslintrc.*` 文件
 
-#### 问题2: 插件导入错误
-**解决方案**: 使用ES模块导入语法
+#### 问题 2: 插件导入错误
+
+**解决方案**: 使用 ES 模块导入语法
+
 ```javascript
 // ❌ 错误
-const vue = require('eslint-plugin-vue')
+const vue = require("eslint-plugin-vue");
 
 // ✅ 正确
-import vue from 'eslint-plugin-vue'
+import vue from "eslint-plugin-vue";
 ```
 
-#### 问题3: 规则覆盖不工作
+#### 问题 3: 规则覆盖不工作
+
 **解决方案**: 使用数组配置，后面的配置会覆盖前面的
+
 ```javascript
 export default [
   // 基础配置
   js.configs.recommended,
-  
+
   // 特定文件配置
   {
-    files: ['**/*.vue'],
+    files: ["**/*.vue"],
     rules: {
       // Vue特定规则
-    }
-  }
-]
+    },
+  },
+];
 ```
 
 ### 4. 验证迁移
@@ -487,8 +591,8 @@ rules: {
 
 ### 2. 团队协作
 
-- 确保所有团队成员使用相同的ESLint配置
-- 在CI/CD中集成ESLint检查
+- 确保所有团队成员使用相同的 ESLint 配置
+- 在 CI/CD 中集成 ESLint 检查
 - 定期更新和维护规则集
 
 ### 3. 性能优化
@@ -497,9 +601,9 @@ rules: {
 // 使用缓存提升性能
 module.exports = {
   cache: true,
-  cacheLocation: 'node_modules/.cache/eslint/',
+  cacheLocation: "node_modules/.cache/eslint/",
   // 其他配置...
-}
+};
 ```
 
 ### 4. 规则禁用指南
@@ -515,8 +619,10 @@ const data: any = response.data; // eslint-disable-line @typescript-eslint/no-ex
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const data: any = response.data;
 ```
+
 ##
- 自定义ESLint规则
+
+自定义 ESLint 规则
 
 ### 团队特定规则配置
 
@@ -561,12 +667,12 @@ rules: {
       'format': ['UPPER_CASE', 'camelCase']
     }
   ],
-  
+
   // Vue组件命名必须使用多个单词
   'vue/multi-word-component-names': ['error', {
     'ignores': ['App', 'Home', 'Login', 'Dashboard']
   }],
-  
+
   // 强制组件文件名与组件名一致
   'vue/match-component-file-name': ['error', {
     'extensions': ['vue'],
@@ -581,20 +687,20 @@ rules: {
 rules: {
   // 限制函数复杂度
   'complexity': ['error', { 'max': 10 }],
-  
+
   // 限制函数参数数量
   'max-params': ['error', { 'max': 4 }],
-  
+
   // 限制文件行数
-  'max-lines': ['warn', { 
-    'max': 300, 
-    'skipBlankLines': true, 
-    'skipComments': true 
+  'max-lines': ['warn', {
+    'max': 300,
+    'skipBlankLines': true,
+    'skipComments': true
   }],
-  
+
   // 强制使用一致的换行符
   'linebreak-style': ['error', 'unix'],
-  
+
   // Vue组件中的属性顺序
   'vue/attributes-order': ['error', {
     'order': [
@@ -611,7 +717,7 @@ rules: {
       'CONTENT'
     ]
   }],
-  
+
   // 强制组件选项顺序
   'vue/order-in-components': ['error', {
     'order': [
@@ -659,22 +765,22 @@ rules: {
 rules: {
   // 禁止使用eval
   'no-eval': 'error',
-  
+
   // 禁止使用with语句
   'no-with': 'error',
-  
+
   // 禁止使用__proto__
   'no-proto': 'error',
-  
+
   // 禁止在Vue模板中使用v-html（防XSS）
   'vue/no-v-html': 'warn',
-  
+
   // 禁止在computed中使用异步操作
   'vue/no-async-in-computed-properties': 'error',
-  
+
   // 禁止在Vue组件中使用未声明的变量
   'vue/no-undef-components': 'error',
-  
+
   // TypeScript安全规则
   '@typescript-eslint/no-unsafe-assignment': 'error',
   '@typescript-eslint/no-unsafe-call': 'error',
@@ -699,13 +805,13 @@ rules: {
   'no-unused-vars': 'error',
   'vue/no-unused-components': 'error',
   '@typescript-eslint/no-explicit-any': 'error',
-  
+
   // 建议修复的警告（不阻止构建）
   'no-console': 'warn',
   'no-debugger': 'warn',
   'vue/no-v-html': 'warn',
   '@typescript-eslint/prefer-nullish-coalescing': 'warn',
-  
+
   // 代码风格相关（可配置为警告或错误）
   'indent': ['warn', 2],
   'quotes': ['warn', 'single'],
@@ -719,37 +825,39 @@ rules: {
 ```javascript
 // 开发环境配置
 const developmentRules = {
-  'no-console': 'warn',
-  'no-debugger': 'warn',
-  '@typescript-eslint/no-explicit-any': 'warn'
-}
+  "no-console": "warn",
+  "no-debugger": "warn",
+  "@typescript-eslint/no-explicit-any": "warn",
+};
 
 // 生产环境配置
 const productionRules = {
-  'no-console': 'error',
-  'no-debugger': 'error',
-  '@typescript-eslint/no-explicit-any': 'error'
-}
+  "no-console": "error",
+  "no-debugger": "error",
+  "@typescript-eslint/no-explicit-any": "error",
+};
 
 // 测试环境配置
 const testRules = {
-  'no-console': 'off',
-  '@typescript-eslint/no-explicit-any': 'off',
-  '@typescript-eslint/no-unsafe-assignment': 'off'
-}
+  "no-console": "off",
+  "@typescript-eslint/no-explicit-any": "off",
+  "@typescript-eslint/no-unsafe-assignment": "off",
+};
 
 module.exports = {
   rules: {
     ...baseRules,
-    ...(process.env.NODE_ENV === 'production' ? productionRules : developmentRules)
+    ...(process.env.NODE_ENV === "production"
+      ? productionRules
+      : developmentRules),
   },
   overrides: [
     {
-      files: ['**/__tests__/**/*', '**/*.{test,spec}.*'],
-      rules: testRules
-    }
-  ]
-}
+      files: ["**/__tests__/**/*", "**/*.{test,spec}.*"],
+      rules: testRules,
+    },
+  ],
+};
 ```
 
 ### 规则禁用和例外处理指南
@@ -759,11 +867,11 @@ module.exports = {
 ```javascript
 // ✅ 好的做法：有明确理由的禁用
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 第三方库类型定义不完整
-const apiResponse: any = await thirdPartyApi.getData()
+const apiResponse: any = await thirdPartyApi.getData();
 
 // ❌ 不好的做法：无理由的禁用
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const data: any = someFunction()
+const data: any = someFunction();
 ```
 
 #### 2. 文件级别禁用
@@ -785,16 +893,16 @@ const data: any = someFunction()
 
 ```javascript
 // 单行禁用
-const config: any = JSON.parse(configString) // eslint-disable-line @typescript-eslint/no-explicit-any
+const config: any = JSON.parse(configString); // eslint-disable-line @typescript-eslint/no-explicit-any
 
 // 下一行禁用
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const config: any = JSON.parse(configString)
+const config: any = JSON.parse(configString);
 
 // 多行禁用
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const config: any = JSON.parse(configString)
-const settings: any = JSON.parse(settingsString)
+const config: any = JSON.parse(configString);
+const settings: any = JSON.parse(settingsString);
 /* eslint-enable @typescript-eslint/no-explicit-any */
 ```
 
@@ -849,7 +957,7 @@ overrides: [
 // 使用TODO注释管理临时禁用
 // TODO: 移除此禁用，当API类型定义完成后
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const response: any = await api.call()
+const response: any = await api.call();
 
 // 使用FIXME标记需要修复的代码
 // FIXME: 重构此函数以符合复杂度要求
@@ -867,33 +975,33 @@ function complexFunction() {
 // eslint-plugin-team-rules/index.js
 module.exports = {
   rules: {
-    'no-chinese-comments': {
+    "no-chinese-comments": {
       meta: {
-        type: 'suggestion',
+        type: "suggestion",
         docs: {
-          description: '禁止在代码中使用中文注释',
-          category: 'Stylistic Issues'
+          description: "禁止在代码中使用中文注释",
+          category: "Stylistic Issues",
         },
-        schema: []
+        schema: [],
       },
       create(context) {
         return {
           Program() {
-            const comments = context.getSourceCode().getAllComments()
-            comments.forEach(comment => {
+            const comments = context.getSourceCode().getAllComments();
+            comments.forEach((comment) => {
               if (/[\u4e00-\u9fa5]/.test(comment.value)) {
                 context.report({
                   node: comment,
-                  message: '请使用英文注释'
-                })
+                  message: "请使用英文注释",
+                });
               }
-            })
-          }
-        }
-      }
-    }
-  }
-}
+            });
+          },
+        };
+      },
+    },
+  },
+};
 ```
 
 #### 2. 使用自定义规则
@@ -901,11 +1009,11 @@ module.exports = {
 ```javascript
 // .eslintrc.js
 module.exports = {
-  plugins: ['team-rules'],
+  plugins: ["team-rules"],
   rules: {
-    'team-rules/no-chinese-comments': 'warn'
-  }
-}
+    "team-rules/no-chinese-comments": "warn",
+  },
+};
 ```
 
 ### 规则配置模板
@@ -915,15 +1023,15 @@ module.exports = {
 ```javascript
 // .eslintrc.strict.js - 用于新项目
 module.exports = {
-  extends: ['./.eslintrc.js'],
+  extends: ["./.eslintrc.js"],
   rules: {
-    '@typescript-eslint/no-explicit-any': 'error',
-    '@typescript-eslint/explicit-function-return-type': 'error',
-    'vue/multi-word-component-names': 'error',
-    'complexity': ['error', { max: 8 }],
-    'max-lines': ['error', { max: 200 }]
-  }
-}
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/explicit-function-return-type": "error",
+    "vue/multi-word-component-names": "error",
+    complexity: ["error", { max: 8 }],
+    "max-lines": ["error", { max: 200 }],
+  },
+};
 ```
 
 #### 宽松模式配置
@@ -931,15 +1039,15 @@ module.exports = {
 ```javascript
 // .eslintrc.loose.js - 用于遗留项目迁移
 module.exports = {
-  extends: ['./.eslintrc.js'],
+  extends: ["./.eslintrc.js"],
   rules: {
-    '@typescript-eslint/no-explicit-any': 'warn',
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    'vue/multi-word-component-names': 'warn',
-    'complexity': 'off',
-    'max-lines': 'off'
-  }
-}
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "vue/multi-word-component-names": "warn",
+    complexity: "off",
+    "max-lines": "off",
+  },
+};
 ```
 
 ## 规则维护和更新
@@ -948,7 +1056,7 @@ module.exports = {
 
 - 每季度审查规则配置的有效性
 - 收集团队反馈，调整规则严重级别
-- 跟进ESLint和插件的更新
+- 跟进 ESLint 和插件的更新
 
 ### 2. 规则变更流程
 
