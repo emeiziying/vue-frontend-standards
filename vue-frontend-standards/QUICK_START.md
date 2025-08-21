@@ -36,34 +36,41 @@ npm create vue@latest my-vue-project
 
 cd my-vue-project
 npm install
+
+# 安装ESLint 9和相关插件
+npm install --save-dev eslint@^9.0.0 eslint-plugin-vue@^9.20.0 @vue/eslint-config-typescript@^13.0.0 @vue/eslint-config-prettier@^9.0.0 @typescript-eslint/eslint-plugin@^7.0.0 @typescript-eslint/parser@^7.0.0 globals@^14.0.0 @eslint/js
 ```
 
 #### 2. 复制配置文件 (2分钟)
 
-**ESLint配置** - 创建 `.eslintrc.js`:
+**ESLint配置 (ESLint 9)** - 创建 `eslint.config.js`:
 ```javascript
-module.exports = {
-  root: true,
-  env: { node: true, browser: true, es2022: true },
-  extends: [
-    'eslint:recommended',
-    '@vue/eslint-config-vue',
-    '@vue/eslint-config-typescript/recommended',
-    '@vue/eslint-config-prettier',
-  ],
-  parser: 'vue-eslint-parser',
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    parser: '@typescript-eslint/parser',
+import js from '@eslint/js'
+import vue from 'eslint-plugin-vue'
+import typescript from '@typescript-eslint/eslint-plugin'
+import typescriptParser from '@typescript-eslint/parser'
+import vueParser from 'vue-eslint-parser'
+import prettier from '@vue/eslint-config-prettier'
+
+export default [
+  js.configs.recommended,
+  {
+    files: ['**/*.vue'],
+    languageOptions: {
+      parser: vueParser,
+      parserOptions: { parser: typescriptParser }
+    },
+    plugins: { vue, '@typescript-eslint': typescript },
+    rules: {
+      ...vue.configs['flat/recommended'].rules,
+      'vue/multi-word-component-names': 'error',
+      'vue/component-definition-name-casing': ['error', 'PascalCase'],
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    }
   },
-  rules: {
-    'vue/multi-word-component-names': 'error',
-    'vue/component-definition-name-casing': ['error', 'PascalCase'],
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-  }
-}
+  prettier
+]
 ```
 
 **Prettier配置** - 创建 `.prettierrc`:

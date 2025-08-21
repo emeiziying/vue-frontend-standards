@@ -1695,8 +1695,8 @@ export default defineConfig({
     "dev": "vite",
     "build": "vue-tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
-    "lint:check": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts",
+    "lint": "eslint . --fix",
+    "lint:check": "eslint .",
     "format": "prettier --write src/",
     "format:check": "prettier --check src/",
     "type-check": "vue-tsc --noEmit",
@@ -1714,18 +1714,23 @@ export default defineConfig({
     "axios": "^1.4.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.2.0",
-    "@vue/eslint-config-prettier": "^7.1.0",
-    "@vue/eslint-config-typescript": "^11.0.0",
-    "@vue/test-utils": "^2.3.0",
-    "@vue/tsconfig": "^0.4.0",
-    "eslint": "^8.39.0",
-    "eslint-plugin-vue": "^9.11.0",
-    "prettier": "^2.8.0",
-    "typescript": "^5.0.0",
-    "vite": "^4.3.0",
-    "vitest": "^0.31.0",
-    "vue-tsc": "^1.6.0"
+    "@eslint/js": "^9.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@vitejs/plugin-vue": "^5.0.0",
+    "@vue/eslint-config-prettier": "^9.0.0",
+    "@vue/eslint-config-typescript": "^13.0.0",
+    "@vue/test-utils": "^2.4.0",
+    "@vue/tsconfig": "^0.5.0",
+    "eslint": "^9.0.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-vue": "^9.20.0",
+    "globals": "^14.0.0",
+    "prettier": "^3.2.0",
+    "typescript": "^5.3.0",
+    "vite": "^5.0.0",
+    "vitest": "^1.2.0",
+    "vue-tsc": "^1.8.0"
   }
 }
 ```

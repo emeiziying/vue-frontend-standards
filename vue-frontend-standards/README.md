@@ -56,7 +56,7 @@ cd my-project && npm install
 <details>
 <summary><strong>⚙️ 2. 配置开发工具</strong></summary>
 
-- 📋 复制 [ESLint配置](./10-eslint-configuration.md#eslintrcjs-配置模板)
+- 📋 复制 [ESLint配置](./10-eslint-configuration.md#eslintconfigjs-配置模板-eslint-9-扁平配置)
 - 🎨 复制 [Prettier配置](./11-prettier-configuration.md#prettierrc配置文件模板)  
 - 🌊 复制 [TailwindCSS配置](./09-css-style-standards.md#tailwindcss配置)
 
@@ -115,7 +115,9 @@ mkdir -p src/{components/{base,common,layout},composables,utils,services,types}
 
 ## 📚 文档导航
 
-> 📖 **完整目录**: 查看 [TABLE_OF_CONTENTS.md](./TABLE_OF_CONTENTS.md) 获取详细的文档索引
+> 📖 **完整目录**: 查看 [TABLE_OF_CONTENTS.md](./TABLE_OF_CONTENTS.md) 获取详细的文档索引  
+> 🔍 **快速索引**: 查看 [INDEX.md](./INDEX.md) 获取多维度导航和快速查找  
+> ⭐ **ESLint 9**: 所有ESLint配置已升级到最新版本
 
 ### 📁 项目结构与组织
 
@@ -846,56 +848,90 @@ export const useUserStore = defineStore('user', () => {
 
 > 🔧 **完整配置**: 查看 [TEMPLATES.md](./TEMPLATES.md) 获取所有配置文件模板
 
-### 📋 ESLint配置
+### 📋 ESLint配置 (ESLint 9)
 
 <details>
-<summary><strong>📄 .eslintrc.js - 代码质量检查配置</strong></summary>
+<summary><strong>📄 eslint.config.js - 代码质量检查配置 (扁平配置)</strong></summary>
 
 ```javascript
-// 📄 .eslintrc.js
-module.exports = {
-  root: true,
-  env: {
-    node: true,
-    browser: true,
-    es2022: true,
+// 📄 eslint.config.js - ESLint 9 扁平配置
+import js from '@eslint/js'
+import vue from 'eslint-plugin-vue'
+import typescript from '@typescript-eslint/eslint-plugin'
+import typescriptParser from '@typescript-eslint/parser'
+import vueParser from 'vue-eslint-parser'
+import prettier from '@vue/eslint-config-prettier'
+import importPlugin from 'eslint-plugin-import'
+import globals from 'globals'
+
+export default [
+  // 🔧 基础JavaScript推荐规则
+  js.configs.recommended,
+  
+  // 🚫 全局忽略配置
+  {
+    ignores: ['dist/', 'node_modules/', '*.min.js', 'coverage/']
   },
-  extends: [
-    'eslint:recommended',                              // 🔧 ESLint推荐规则
-    '@vue/eslint-config-vue',                         // 🎯 Vue官方规则
-    '@vue/eslint-config-typescript/recommended',      // 📘 TypeScript规则
-    '@vue/eslint-config-prettier',                    // 🎨 Prettier集成
-  ],
-  parser: 'vue-eslint-parser',
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    parser: '@typescript-eslint/parser',
+
+  // 🌐 基础配置 - 适用于所有文件
+  {
+    languageOptions: {
+      globals: { ...globals.browser, ...globals.node, ...globals.es2022 },
+      ecmaVersion: 'latest',
+      sourceType: 'module'
+    },
+    plugins: { import: importPlugin },
+    rules: {
+      // 🔍 代码质量规则
+      'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+      'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+      'prefer-const': 'error',
+      'no-var': 'error',
+      
+      // 📦 导入规则
+      'import/order': ['error', {
+        'groups': ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+        'newlines-between': 'always'
+      }]
+    }
   },
-  plugins: ['vue', '@typescript-eslint', 'import'],
-  rules: {
-    // 🎯 Vue相关规则
-    'vue/multi-word-component-names': 'error',
-    'vue/component-definition-name-casing': ['error', 'PascalCase'],
-    'vue/component-name-in-template-casing': ['error', 'PascalCase'],
-    
-    // 📘 TypeScript相关规则
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    
-    // 🔍 代码质量规则
-    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'prefer-const': 'error',
-    'no-var': 'error',
-    
-    // 📦 导入规则
-    'import/order': ['error', {
-      'groups': ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
-      'newlines-between': 'always'
-    }]
-  }
-}
+
+  // 🎯 Vue文件配置
+  {
+    files: ['**/*.vue'],
+    languageOptions: {
+      parser: vueParser,
+      parserOptions: { parser: typescriptParser, ecmaVersion: 'latest', sourceType: 'module' }
+    },
+    plugins: { vue, '@typescript-eslint': typescript },
+    rules: {
+      ...vue.configs['flat/recommended'].rules,
+      // 🎯 Vue相关规则
+      'vue/multi-word-component-names': 'error',
+      'vue/component-definition-name-casing': ['error', 'PascalCase'],
+      'vue/component-name-in-template-casing': ['error', 'PascalCase'],
+      
+      // 📘 TypeScript相关规则
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/explicit-function-return-type': 'off'
+    }
+  },
+
+  // 📘 TypeScript文件配置
+  {
+    files: ['**/*.ts', '**/*.tsx'],
+    languageOptions: { parser: typescriptParser },
+    plugins: { '@typescript-eslint': typescript },
+    rules: {
+      ...typescript.configs.recommended.rules,
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-explicit-any': 'error'
+    }
+  },
+
+  // 🎨 Prettier集成 (必须放在最后)
+  prettier
+]
 ```
 
 </details>
@@ -1212,9 +1248,15 @@ console.log('debug info')       // 生产环境不应有console.log
 
 ### 更新日志
 
+- **v1.3.0** (2024-03-01): ⭐ **重大更新** - ESLint升级到v9
+  - 🔄 迁移到ESLint 9扁平配置格式
+  - 📦 更新所有相关插件版本
+  - 📖 添加详细的迁移指南
+  - 🚀 完善快速开始指南
+  - 📚 新增完整示例和索引导航
+- **v1.2.0** (2024-02-01): 完善测试规范
+- **v1.1.0** (2024-01-15): 添加TailwindCSS规范
 - **v1.0.0** (2024-01-01): 初始版本发布
-- **v1.1.0** (2024-02-01): 添加TailwindCSS规范
-- **v1.2.0** (2024-03-01): 完善测试规范
 
 ---
 
