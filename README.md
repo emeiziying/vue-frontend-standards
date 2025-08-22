@@ -1014,9 +1014,10 @@ export default defineConfigWithVueTs(
   --breakpoint-xs: 475px;
 }
 
-/* 🔌 插件功能通过CSS实现 */
-@plugin "@tailwindcss/forms";
-@plugin "@tailwindcss/typography";
+/* 🔌 插件功能通过CSS实现 (部分功能已内置) */
+@plugin "@tailwindcss/forms";      /* 表单样式增强 */
+@plugin "@tailwindcss/typography"; /* 排版样式 */
+/* aspect-ratio 已内置到核心，无需插件 */
 ```
 
 </details>

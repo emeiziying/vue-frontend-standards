@@ -563,10 +563,10 @@ TailwindCSS采用原子化CSS的方法，每个类只负责一个样式属性。
   }
 }
 
-/* 插件功能 */
-@plugin "@tailwindcss/forms";
-@plugin "@tailwindcss/typography";
-@plugin "@tailwindcss/aspect-ratio";
+/* 插件功能 (TailwindCSS 4.x中部分功能已内置) */
+@plugin "@tailwindcss/forms";      /* 表单样式增强 */
+@plugin "@tailwindcss/typography"; /* 排版样式 */
+/* aspect-ratio 已内置到核心，无需插件 */
 ```
 
 #### CSS变量与Tailwind 4.x集成
