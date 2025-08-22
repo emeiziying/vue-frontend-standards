@@ -9,7 +9,7 @@
 
 **一套完整的Vue前端开发规范文档**
 
-[📖 快速开始](#快速开始) • [📋 文档目录](#文档导航) • [💡 代码示例](#代码示例) • [🔧 配置模板](#配置文件模板)
+[📖 快速开始](#-快速开始) • [📋 文档目录](#-文档导航) • [💡 代码示例](#-代码示例) • [🔧 配置模板](#️-配置文件模板)
 
 </div>
 
@@ -78,7 +78,7 @@ mkdir -p src/{components/{base,common,layout},composables,utils,services,types}
 <summary><strong>🎯 4. 开始开发</strong></summary>
 
 - 📚 阅读 [Vue组件规范](./02-vue-component-structure.md)
-- 💡 查看 [代码示例](#代码示例)
+- 💡 查看 [代码示例](#-代码示例)
 - 🔍 使用 [质量检查清单](./25-code-quality-checklist.md)
 
 </details>
