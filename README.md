@@ -979,59 +979,44 @@ export default defineConfigWithVueTs(
 ### 🌊 TailwindCSS配置
 
 <details>
-<summary><strong>📄 tailwind.config.js - 原子化CSS配置</strong></summary>
+<summary><strong>🎨 TailwindCSS 4.x - CSS-first配置</strong></summary>
 
-```javascript
-// 📄 tailwind.config.js
-/** @type {import('tailwindcss').Config} */
-export default {
-  content: [
-    "./index.html",                           // 🏠 HTML入口文件
-    "./src/**/*.{vue,js,ts,jsx,tsx}",        // 📁 源代码文件
-  ],
-  theme: {
-    extend: {
-      // 🎨 自定义颜色系统
-      colors: {
-        primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',    // 主色调
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
-        },
-        secondary: {
-          50: '#f8fafc',
-          500: '#64748b',
-          900: '#0f172a',
-        }
-      },
-      // 📏 自定义间距
-      spacing: {
-        '18': '4.5rem',
-        '88': '22rem',
-      },
-      // 🔤 自定义字体
-      fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-      },
-      // 📱 自定义断点
-      screens: {
-        'xs': '475px',
-      }
-    },
-  },
-  plugins: [
-    // 🔌 推荐插件
-    // require('@tailwindcss/forms'),
-    // require('@tailwindcss/typography'),
-  ],
+```css
+/* 📄 src/styles/tailwind.css */
+@import "tailwindcss";
+
+/* 🎨 TailwindCSS 4.x 使用CSS-first配置，直接在CSS中定义主题 */
+@theme {
+  /* 🎨 自定义颜色系统 */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;    /* 主色调 */
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+  
+  --color-secondary-50: #f8fafc;
+  --color-secondary-500: #64748b;
+  --color-secondary-900: #0f172a;
+  
+  /* 📏 自定义间距 */
+  --spacing-18: 4.5rem;
+  --spacing-88: 22rem;
+  
+  /* 🔤 自定义字体 */
+  --font-family-sans: Inter, system-ui, sans-serif;
+  
+  /* 📱 自定义断点 */
+  --breakpoint-xs: 475px;
 }
+
+/* 🔌 插件功能通过CSS实现 */
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/typography";
 ```
 
 </details>

@@ -87,8 +87,34 @@ export default defineConfigWithVueTs(
 
 **TailwindCSS配置** (可选) - 如果使用TailwindCSS:
 ```bash
-npm install -D tailwindcss postcss autoprefixer
-npx tailwindcss init -p
+npm install tailwindcss @tailwindcss/vite
+```
+
+在 `vite.config.js` 中配置TailwindCSS插件:
+```javascript
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import tailwindcss from '@tailwindcss/vite'
+
+export default defineConfig({
+  plugins: [
+    vue(),
+    tailwindcss(),
+  ],
+})
+```
+
+在CSS文件中导入TailwindCSS并进行配置:
+```css
+@import "tailwindcss";
+
+/* TailwindCSS 4.x 使用CSS-first配置，无需tailwind.config.js */
+@theme {
+  --color-primary: #3b82f6;
+  --color-secondary: #6b7280;
+  --font-family-sans: Inter, system-ui, sans-serif;
+  --spacing-18: 4.5rem;
+}
 ```
 
 #### 3. 设置项目结构 (2分钟)

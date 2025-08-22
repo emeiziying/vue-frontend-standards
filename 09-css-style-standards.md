@@ -477,116 +477,102 @@ TailwindCSS采用原子化CSS的方法，每个类只负责一个样式属性。
 
 ### 自定义主题配置标准
 
-#### Tailwind配置文件结构
-```javascript
-// tailwind.config.js
-/** @type {import('tailwindcss').Config} */
-export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{vue,js,ts,jsx,tsx}",
-  ],
-  darkMode: 'class', // 或 'media'
-  theme: {
-    extend: {
-      // 自定义颜色系统
-      colors: {
-        primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',  // 主色调
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
-          950: '#172554',
-        },
-        secondary: {
-          50: '#f9fafb',
-          100: '#f3f4f6',
-          200: '#e5e7eb',
-          300: '#d1d5db',
-          400: '#9ca3af',
-          500: '#6b7280',  // 次要色调
-          600: '#4b5563',
-          700: '#374151',
-          800: '#1f2937',
-          900: '#111827',
-          950: '#030712',
-        },
-        success: '#10b981',
-        warning: '#f59e0b',
-        error: '#ef4444',
-        info: '#06b6d4',
-      },
-      
-      // 自定义字体
-      fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        serif: ['Georgia', 'serif'],
-        mono: ['Fira Code', 'monospace'],
-        display: ['Poppins', 'sans-serif'],
-      },
-      
-      // 自定义间距
-      spacing: {
-        '18': '4.5rem',
-        '88': '22rem',
-        '128': '32rem',
-      },
-      
-      // 自定义断点
-      screens: {
-        'xs': '475px',
-        '3xl': '1600px',
-      },
-      
-      // 自定义阴影
-      boxShadow: {
-        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
-        'strong': '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 20px 40px -5px rgba(0, 0, 0, 0.04)',
-      },
-      
-      // 自定义动画
-      animation: {
-        'fade-in': 'fadeIn 0.5s ease-in-out',
-        'slide-up': 'slideUp 0.3s ease-out',
-        'bounce-gentle': 'bounceGentle 2s infinite',
-      },
-      
-      keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
-        slideUp: {
-          '0%': { transform: 'translateY(10px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
-        bounceGentle: {
-          '0%, 100%': { transform: 'translateY(-5%)' },
-          '50%': { transform: 'translateY(0)' },
-        },
-      },
-    },
-  },
-  plugins: [
-    require('@tailwindcss/forms'),
-    require('@tailwindcss/typography'),
-    require('@tailwindcss/aspect-ratio'),
-  ],
+#### TailwindCSS 4.x CSS-first配置
+```css
+/* src/styles/tailwind.css */
+@import "tailwindcss";
+
+/* TailwindCSS 4.x 使用CSS-first配置，无需JavaScript配置文件 */
+@theme {
+  /* 自定义颜色系统 */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;  /* 主色调 */
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+  --color-primary-950: #172554;
+  
+  --color-secondary-50: #f9fafb;
+  --color-secondary-100: #f3f4f6;
+  --color-secondary-200: #e5e7eb;
+  --color-secondary-300: #d1d5db;
+  --color-secondary-400: #9ca3af;
+  --color-secondary-500: #6b7280;  /* 次要色调 */
+  --color-secondary-600: #4b5563;
+  --color-secondary-700: #374151;
+  --color-secondary-800: #1f2937;
+  --color-secondary-900: #111827;
+  --color-secondary-950: #030712;
+  
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #06b6d4;
+  
+  /* 自定义字体 */
+  --font-family-sans: Inter, system-ui, sans-serif;
+  --font-family-serif: Georgia, serif;
+  --font-family-mono: 'Fira Code', monospace;
+  --font-family-display: Poppins, sans-serif;
+  
+  /* 自定义间距 */
+  --spacing-18: 4.5rem;
+  --spacing-88: 22rem;
+  --spacing-128: 32rem;
+  
+  /* 自定义断点 */
+  --breakpoint-xs: 475px;
+  --breakpoint-3xl: 1600px;
+  
+  /* 自定义阴影 */
+  --shadow-soft: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
+  --shadow-strong: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 20px 40px -5px rgba(0, 0, 0, 0.04);
+  
+  /* 自定义动画时长 */
+  --animate-fade-in: 0.5s ease-in-out;
+  --animate-slide-up: 0.3s ease-out;
+  --animate-bounce-gentle: 2s infinite;
 }
+
+/* 自定义动画关键帧 */
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes slideUp {
+  0% { transform: translateY(10px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes bounceGentle {
+  0%, 100% { transform: translateY(-5%); }
+  50% { transform: translateY(0); }
+}
+
+/* 暗色模式配置 */
+@media (prefers-color-scheme: dark) {
+  @theme {
+    --color-primary-50: #172554;
+    --color-primary-900: #eff6ff;
+  }
+}
+
+/* 插件功能 */
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/typography";
+@plugin "@tailwindcss/aspect-ratio";
 ```
 
-#### CSS变量与Tailwind集成
+#### CSS变量与Tailwind 4.x集成
 ```css
-/* src/styles/variables.css */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* src/styles/main.css */
+@import "tailwindcss";
 
 @layer base {
   :root {
