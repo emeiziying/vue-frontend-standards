@@ -1742,6 +1742,220 @@ export default defineConfig({
 
 ---
 
+## 🔧 Composables示例
+
+### 基础状态管理Composables
+
+#### useToggle - 布尔状态切换
+```typescript
+// composables/useToggle.ts
+import { ref, Ref } from 'vue'
+
+export const useToggle = (initialValue = false): [
+  Ref<boolean>,
+  (value?: boolean) => void
+] => {
+  const state = ref(initialValue)
+  
+  const toggle = (value?: boolean) => {
+    state.value = typeof value === 'boolean' ? value : !state.value
+  }
+  
+  return [state, toggle]
+}
+
+// 使用示例
+const [isVisible, toggleVisible] = useToggle(false)
+```
+
+#### useCounter - 计数器
+```typescript
+// composables/useCounter.ts
+import { ref, computed, readonly } from 'vue'
+
+interface UseCounterOptions {
+  min?: number
+  max?: number
+  step?: number
+}
+
+export const useCounter = (
+  initialValue = 0,
+  options: UseCounterOptions = {}
+) => {
+  const { min = -Infinity, max = Infinity, step = 1 } = options
+  const count = ref(initialValue)
+  
+  const increment = () => {
+    if (count.value < max) count.value += step
+  }
+  
+  const decrement = () => {
+    if (count.value > min) count.value -= step
+  }
+  
+  const reset = () => {
+    count.value = initialValue
+  }
+  
+  const isMin = computed(() => count.value <= min)
+  const isMax = computed(() => count.value >= max)
+  
+  return {
+    count: readonly(count),
+    increment,
+    decrement,
+    reset,
+    isMin,
+    isMax
+  }
+}
+```
+
+### 异步数据处理Composables
+
+#### useAsyncData - 异步数据获取
+```typescript
+// composables/useAsyncData.ts
+import { ref, readonly, Ref } from 'vue'
+
+interface UseAsyncDataOptions<T> {
+  immediate?: boolean
+  initialData?: T
+  onSuccess?: (data: T) => void
+  onError?: (error: Error) => void
+}
+
+export const useAsyncData = <T>(
+  fetcher: () => Promise<T>,
+  options: UseAsyncDataOptions<T> = {}
+) => {
+  const {
+    immediate = true,
+    initialData,
+    onSuccess,
+    onError
+  } = options
+  
+  const data = ref<T | undefined>(initialData)
+  const loading = ref(false)
+  const error = ref<Error | null>(null)
+  
+  const execute = async () => {
+    try {
+      loading.value = true
+      error.value = null
+      
+      const result = await fetcher()
+      data.value = result
+      
+      onSuccess?.(result)
+      return result
+    } catch (err) {
+      const errorObj = err instanceof Error ? err : new Error(String(err))
+      error.value = errorObj
+      onError?.(errorObj)
+      throw errorObj
+    } finally {
+      loading.value = false
+    }
+  }
+  
+  if (immediate) {
+    execute()
+  }
+  
+  return {
+    data: readonly(data) as Readonly<Ref<T | undefined>>,
+    loading: readonly(loading),
+    error: readonly(error),
+    execute,
+    refresh: execute
+  }
+}
+```
+
+### 工具类Composables
+
+#### useDebounce - 防抖处理
+```typescript
+// composables/useDebounce.ts
+import { ref, watch, Ref } from 'vue'
+
+export const useDebounce = <T>(
+  value: Ref<T>,
+  delay: number
+): Ref<T> => {
+  const debouncedValue = ref<T>(value.value)
+  
+  watch(value, (newValue) => {
+    const timer = setTimeout(() => {
+      debouncedValue.value = newValue
+    }, delay)
+    
+    return () => clearTimeout(timer)
+  })
+  
+  return debouncedValue as Ref<T>
+}
+
+// 使用示例
+const searchQuery = ref('')
+const debouncedQuery = useDebounce(searchQuery, 300)
+
+watch(debouncedQuery, (query) => {
+  // 执行搜索
+  performSearch(query)
+})
+```
+
+#### useLocalStorage - 本地存储同步
+```typescript
+// composables/useLocalStorage.ts
+import { ref, watch, Ref } from 'vue'
+
+export const useLocalStorage = <T>(
+  key: string,
+  defaultValue: T
+): [Ref<T>, (value: T) => void, () => void] => {
+  const storedValue = localStorage.getItem(key)
+  const initialValue = storedValue !== null 
+    ? JSON.parse(storedValue)
+    : defaultValue
+  
+  const state = ref<T>(initialValue)
+  
+  const setValue = (value: T) => {
+    state.value = value
+  }
+  
+  const removeValue = () => {
+    localStorage.removeItem(key)
+    state.value = defaultValue
+  }
+  
+  // 监听状态变化，同步到localStorage
+  watch(
+    state,
+    (newValue) => {
+      if (newValue === undefined || newValue === null) {
+        localStorage.removeItem(key)
+      } else {
+        localStorage.setItem(key, JSON.stringify(newValue))
+      }
+    },
+    { deep: true }
+  )
+  
+  return [state, setValue, removeValue]
+}
+
+// 使用示例
+const [theme, setTheme] = useLocalStorage('theme', 'light')
+```
+
+---
+
 ## 📚 代码片段库
 
 ### VS Code代码片段

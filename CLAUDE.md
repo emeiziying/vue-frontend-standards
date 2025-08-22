@@ -4,21 +4,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-This is a comprehensive Vue.js frontend development standards repository containing detailed documentation and best practices for building modern Vue applications. The repository serves as a complete style guide and reference for teams adopting Vue 3, TypeScript, and modern frontend tooling.
+This is a comprehensive Vue.js frontend development standards documentation repository containing detailed guidelines and best practices for building modern Vue applications. The repository serves as a complete reference guide for teams adopting Vue 3, TypeScript, and modern frontend tooling.
 
 ## Key Architecture & Structure
 
 ### Documentation Organization
-The repository follows a well-organized documentation structure under `vue-frontend-standards/`:
+The repository is organized as a collection of markdown documentation files covering all aspects of Vue frontend development:
 
-- **Core Development**: Component structure, props/events, lifecycle management
-- **Language Standards**: JavaScript/TypeScript patterns, type definitions, async programming
-- **Tooling Configuration**: ESLint 9, Prettier, build tools (Vite)
-- **State Management**: Pinia stores and patterns
-- **Routing**: Vue Router configuration and guards
-- **Quality Assurance**: Testing, error handling, code review processes
-- **Performance**: Optimization strategies for Vue apps and builds
-- **Workflow**: Git standards, branch management, CI/CD practices
+- **Core Development**: Component structure, props/events, lifecycle management (01-04)
+- **Language Standards**: JavaScript/TypeScript patterns, type definitions, async programming (05-07)
+- **Template & Styling**: HTML templates, CSS standards, styling methodologies (08-09)
+- **Tooling Configuration**: ESLint 9, Prettier, build tools configuration (10-12)
+- **State Management**: Pinia stores and state patterns (13-14)
+- **Routing**: Vue Router configuration and guards (15-16)
+- **Workflow**: Git standards, branch management, code review processes (17-19)
+- **Performance & Quality**: Optimization strategies, testing standards, error handling (20-25)
 
 ### Technology Stack Standards
 - **Framework**: Vue 3 with Composition API (script setup syntax)
@@ -32,7 +32,9 @@ The repository follows a well-organized documentation structure under `vue-front
 
 ## Development Commands
 
-### Linting and Code Quality
+Since this is a documentation-only repository, there are no executable commands. However, the documentation provides comprehensive command templates for Vue projects:
+
+### Linting and Code Quality (from documentation)
 ```bash
 # Fast error checking with oxlint (recommended for development)
 npm run lint:oxlint
@@ -47,7 +49,7 @@ npm run lint
 npm run lint:fix
 ```
 
-### Code Formatting
+### Code Formatting (from documentation)
 ```bash
 # Format code with Prettier
 npm run format
@@ -56,7 +58,7 @@ npm run format
 npm run format:check
 ```
 
-### Testing
+### Testing (from documentation)
 ```bash
 # Run unit tests
 npm run test:unit
@@ -68,7 +70,7 @@ npm run test:coverage
 npm run test:ui
 ```
 
-### Building and Type Checking
+### Building and Type Checking (from documentation)
 ```bash
 # Type checking with TypeScript
 npm run type-check
@@ -83,250 +85,96 @@ npm run build:dev
 npm run preview
 ```
 
-## Vue Component Development Standards
+## Key Documentation Files
 
-### Component Structure Template
-```vue
-<template>
-  <div class="component-name">
-    <!-- Use BEM naming convention for CSS classes -->
-    <header v-if="showHeader" class="component-name__header">
-      <h2 class="component-name__title">{{ title }}</h2>
-    </header>
-    
-    <main class="component-name__content">
-      <slot name="content">
-        <p class="component-name__default-text">Default content</p>
-      </slot>
-    </main>
-  </div>
-</template>
+### Quick Reference
+- **README.md**: Main overview with quick start guide and navigation
+- **QUICK_START.md**: 5-minute setup guide for new projects
+- **INDEX.md**: Multi-dimensional navigation and quick lookup
+- **TABLE_OF_CONTENTS.md**: Complete document index
+- **EXAMPLES.md**: Complete code examples and templates
+- **TEMPLATES.md**: Configuration file templates
 
-<script setup lang="ts">
-// 1. Imports (Vue APIs first, then third-party, then local)
-import { ref, computed, onMounted } from 'vue'
-import type { User } from '@/types/user'
+### Core Standards
+- **01-project-structure.md**: Standard directory organization and file naming
+- **02-vue-component-structure.md**: Component templates and script setup patterns
+- **10-eslint-configuration.md**: ESLint 9 configuration with Vue official flat config
+- **13-pinia-store-structure.md**: State management patterns
+- **25-code-quality-checklist.md**: Quality assurance guidelines
 
-// 2. Props interface and definition
-interface Props {
-  title: string
-  count?: number
-  user?: User
-}
+## Working with This Repository
 
-const props = withDefaults(defineProps<Props>(), {
-  count: 0,
-  user: undefined
-})
+### Understanding the Structure
+This repository contains 25 numbered documentation files covering different aspects of Vue development, plus several reference files (README, INDEX, etc.). Each file follows a consistent structure with:
 
-// 3. Emits interface and definition
-interface Emits {
-  update: [value: string]
-  change: [event: Event]
-}
+- Clear explanations of standards
+- Code examples and templates
+- Best practices and anti-patterns
+- Configuration templates
 
-const emit = defineEmits<Emits>()
+### Common Tasks
 
-// 4. Reactive state
-const isLoading = ref(false)
+#### Finding Specific Information
+1. Check **INDEX.md** for quick topic lookup
+2. Use **TABLE_OF_CONTENTS.md** for detailed navigation
+3. Search for specific patterns using grep/search tools
 
-// 5. Computed properties
-const displayTitle = computed(() => props.title.toUpperCase())
+#### Understanding Vue Standards
+1. Start with **README.md** for overview
+2. Follow **QUICK_START.md** for practical setup
+3. Reference specific numbered files for detailed standards
+4. Use **EXAMPLES.md** for complete implementation examples
 
-// 6. Methods
-const handleClick = () => {
-  emit('update', 'new value')
-}
-
-// 7. Lifecycle hooks
-onMounted(() => {
-  // Component initialization
-})
-</script>
-
-<style scoped>
-/* Use BEM methodology for CSS classes */
-.component-name {
-  /* Layout properties first */
-  display: flex;
-  flex-direction: column;
-  
-  /* Size properties */
-  width: 100%;
-  padding: 1rem;
-  
-  /* Appearance properties */
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-}
-
-.component-name__header {
-  margin-bottom: 1rem;
-}
-
-.component-name__title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0;
-}
-</style>
-```
-
-### Key Development Patterns
-
-1. **Script Setup Syntax**: Always use `<script setup lang="ts">` for new components
-2. **TypeScript Types**: Define explicit interfaces for Props and Emits
-3. **BEM CSS**: Use Block__Element--Modifier naming for CSS classes
-4. **Composition API**: Prefer composables over mixins for reusable logic
+#### Configuration Templates
+- ESLint 9 config: **10-eslint-configuration.md**
+- Prettier config: **11-prettier-configuration.md**
+- Build tools: **12-build-tool-configuration.md**
+- All templates: **TEMPLATES.md**
 
 ## File Organization Standards
 
-### Directory Structure
-```
-src/
-├── components/
-│   ├── base/              # Basic UI components (BaseButton, BaseInput)
-│   ├── common/            # Reusable business components
-│   └── layout/            # Layout components (Header, Sidebar)
-├── views/                 # Page components
-├── stores/                # Pinia stores
-│   └── modules/           # Store modules by feature
-├── composables/           # Composition functions
-├── utils/                 # Utility functions
-│   ├── helpers/           # Helper functions
-│   ├── validators/        # Validation functions
-│   └── constants/         # Constants
-├── services/              # API services
-│   ├── api/               # API endpoints
-│   └── http/              # HTTP client configuration
-├── types/                 # TypeScript type definitions
-└── assets/                # Static assets
-```
+### Naming Conventions
+- Numbered files (01-25): Core standards in logical progression
+- README.md: Main entry point with overview
+- INDEX.md: Multi-dimensional navigation
+- QUICK_START.md: Fast setup guide
+- EXAMPLES.md: Complete code examples
+- TEMPLATES.md: Configuration templates
+- TABLE_OF_CONTENTS.md: Detailed file listing
 
-### File Naming Conventions
-- **Components**: PascalCase (UserProfile.vue, ProductCard.vue)
-- **Pages**: PascalCase + Page suffix (UserListPage.vue)
-- **Composables**: camelCase with 'use' prefix (useUser.ts, useAuth.ts)
-- **Utils**: camelCase (formatUtils.ts, apiHelpers.ts)
-- **Types**: camelCase + .types.ts (user.types.ts, api.types.ts)
+### Content Structure
+Each documentation file typically includes:
+1. Overview and objectives
+2. Standards and guidelines  
+3. Code examples and templates
+4. Best practices
+5. Common pitfalls to avoid
+6. Related resources
 
-## ESLint Configuration (v9)
+## ESLint 9 and Modern Tooling Focus
 
-The project uses ESLint 9 with Vue official flat configuration:
+This documentation emphasizes modern Vue development with:
+- **ESLint 9**: Flat configuration format with Vue official configs
+- **Oxlint Integration**: High-performance Rust-based linting
+- **TypeScript**: Strict type checking patterns
+- **Vue 3**: Composition API and script setup syntax
+- **Modern Build Tools**: Vite configuration and optimization
 
-### Key Rules Enforced
-- Vue component naming must use PascalCase
-- TypeScript strict mode with explicit types
-- No unused variables (prefix with _ to ignore)
-- Console statements warned in production
-- Consistent code formatting via Prettier integration
+## Important Notes
 
-### Performance Optimization
-- **oxlint**: Ultra-fast Rust-based linter for basic error checking
-- **ESLint**: Comprehensive style and best practice checking
-- Use `npm run lint:oxlint` for quick feedback during development
-- Use `npm run lint:eslint` for thorough checking before commits
+1. **Documentation-Only Repository**: This contains no executable code, only comprehensive documentation
+2. **Reference Material**: Designed as a complete style guide for Vue teams
+3. **Modern Standards**: Focuses on Vue 3, TypeScript, ESLint 9, and current best practices
+4. **Template Source**: Provides copy-paste templates and configurations for real projects
+5. **Chinese + English**: Some documents contain Chinese content with English technical terms
 
-## Testing Standards
+## Usage Workflow
 
-### Test Structure
-```typescript
-// UserProfile.test.ts
-import { describe, it, expect, beforeEach } from 'vitest'
-import { mount } from '@vue/test-utils'
-import UserProfile from '@/components/UserProfile.vue'
+When working with this repository:
+1. **For Overview**: Start with README.md
+2. **For Quick Setup**: Use QUICK_START.md  
+3. **For Specific Topics**: Use INDEX.md to navigate to relevant files
+4. **For Examples**: Reference EXAMPLES.md and TEMPLATES.md
+5. **For Implementation**: Copy templates and adapt to specific projects
 
-describe('UserProfile', () => {
-  let wrapper
-
-  beforeEach(() => {
-    wrapper = mount(UserProfile, {
-      props: {
-        user: { name: 'John Doe', email: 'john@example.com' }
-      }
-    })
-  })
-
-  describe('rendering', () => {
-    it('should display user information correctly', () => {
-      expect(wrapper.find('[data-testid="user-name"]').text()).toBe('John Doe')
-    })
-  })
-
-  describe('interactions', () => {
-    it('should emit edit event when edit button clicked', async () => {
-      await wrapper.find('[data-testid="edit-button"]').trigger('click')
-      expect(wrapper.emitted('edit')).toBeTruthy()
-    })
-  })
-})
-```
-
-### Coverage Requirements
-- Core business logic: 90%+ coverage
-- Utility functions: 95%+ coverage  
-- Vue components: 80%+ coverage
-- Always use `data-testid` attributes for test selectors
-
-## State Management with Pinia
-
-### Store Structure
-```typescript
-// stores/modules/user.ts
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-
-export const useUserStore = defineStore('user', () => {
-  // State
-  const user = ref<User | null>(null)
-  const isLoading = ref(false)
-
-  // Getters
-  const isLoggedIn = computed(() => !!user.value)
-
-  // Actions
-  const login = async (credentials: LoginCredentials) => {
-    isLoading.value = true
-    try {
-      const response = await userApi.login(credentials)
-      user.value = response.data
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  return { user, isLoading, isLoggedIn, login }
-})
-```
-
-## Important Development Notes
-
-1. **Always run linting before commits**: Use `npm run lint` to catch issues early
-2. **Type safety**: Leverage TypeScript strictly - avoid `any` types
-3. **Component composition**: Keep components focused and composable
-4. **Performance**: Use Vue's built-in optimizations (v-memo, v-once when appropriate)
-5. **Accessibility**: Include proper ARIA attributes and semantic HTML
-6. **Mobile-first**: Design responsive layouts from mobile up
-
-## Git Workflow
-
-### Commit Message Format
-```
-type: brief description
-
-feat: add user authentication feature
-fix: resolve navigation menu overflow issue  
-docs: update component documentation
-style: format code with prettier
-refactor: simplify user store logic
-test: add unit tests for UserCard component
-```
-
-### Branch Naming
-- `feature/user-authentication`
-- `fix/navigation-overflow`
-- `docs/update-readme`
-
-This repository represents a production-ready Vue development standard that emphasizes type safety, performance, maintainability, and modern best practices.
+This repository serves as the authoritative source for Vue frontend development standards and should be referenced when setting up new projects or establishing team coding guidelines.

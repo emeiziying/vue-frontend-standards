@@ -199,6 +199,28 @@ mkdir -p src/{components/{base,common,layout},composables,utils,services,types}
 <td>
 
 • 生命周期钩子  
+• 副作用清理  
+• 最佳实践
+
+</td>
+</tr>
+<tr>
+<td>
+
+**[05-自定义Composables](./05-vue-composables.md)**
+
+</td>
+<td>自定义组合函数规范</td>
+<td>
+
+• 状态管理  
+• 异步处理  
+• 业务逻辑封装
+
+</td>
+</tr>
+
+• 生命周期钩子  
 • 副作用处理  
 • 清理机制
 

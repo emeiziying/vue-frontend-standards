@@ -15,63 +15,65 @@
   - Props定义、事件处理、类型约束
 - **生命周期**: [04-Vue生命周期](./04-vue-lifecycle.md)
   - Composition API、副作用处理、清理
+- **自定义Composables**: [05-自定义Composables](./05-vue-composables.md)
+  - 状态管理、异步处理、业务逻辑封装
 
 #### 💻 JavaScript/TypeScript
-- **基础语法**: [05-JavaScript/TypeScript基础](./05-javascript-typescript-basics.md)
+- **基础语法**: [06-JavaScript/TypeScript基础](./05-javascript-typescript-basics.md)
   - 变量、函数、对象操作规范
-- **类型系统**: [06-TypeScript类型](./06-typescript-types.md)
+- **类型系统**: [07-TypeScript类型](./06-typescript-types.md)
   - 接口、泛型、类型守卫
-- **异步编程**: [07-异步编程](./07-async-programming.md)
+- **异步编程**: [08-异步编程](./07-async-programming.md)
   - Promise、async/await、错误处理
 
 #### 🎨 模板与样式
-- **HTML模板**: [08-HTML模板标准](./08-html-template-standards.md)
+- **HTML模板**: [09-HTML模板标准](./08-html-template-standards.md)
   - Vue指令、条件渲染、插槽
-- **CSS样式**: [09-CSS样式标准](./09-css-style-standards.md)
+- **CSS样式**: [10-CSS样式标准](./09-css-style-standards.md)
   - CSS规范、TailwindCSS、响应式设计
 
 #### 🔧 工具配置
-- **ESLint**: [10-ESLint配置](./10-eslint-configuration.md) ⭐ **ESLint 9 + Vue官方推荐配置**
+- **ESLint**: [11-ESLint配置](./10-eslint-configuration.md) ⭐ **ESLint 9 + Vue官方推荐配置**
   - 代码质量检查、Vue官方扁平配置、规则定制
-- **Prettier**: [11-Prettier配置](./11-prettier-configuration.md)
+- **Prettier**: [12-Prettier配置](./11-prettier-configuration.md)
   - 代码格式化、编辑器集成
-- **构建工具**: [12-构建工具配置](./12-build-tool-configuration.md)
+- **构建工具**: [13-构建工具配置](./12-build-tool-configuration.md)
   - Vite配置、环境变量、打包优化
 
 #### 🗄️ 状态管理与路由
-- **Pinia结构**: [13-Pinia Store结构](./13-pinia-store-structure.md)
+- **Pinia结构**: [14-Pinia Store结构](./13-pinia-store-structure.md)
   - Store定义、模块化组织
-- **状态模式**: [14-Pinia状态模式](./14-pinia-state-patterns.md)
+- **状态模式**: [15-Pinia状态模式](./14-pinia-state-patterns.md)
   - 异步处理、错误管理
-- **路由配置**: [15-Vue Router配置](./15-vue-router-configuration.md)
+- **路由配置**: [16-Vue Router配置](./15-vue-router-configuration.md)
   - 路由定义、嵌套路由
-- **路由守卫**: [16-Vue Router守卫](./16-vue-router-guards.md)
+- **路由守卫**: [17-Vue Router守卫](./16-vue-router-guards.md)
   - 导航守卫、权限控制
 
 #### 🔄 Git工作流
-- **提交规范**: [17-Git提交规范](./17-git-commit-standards.md)
+- **提交规范**: [18-Git提交规范](./17-git-commit-standards.md)
   - Commit格式、类型定义
-- **分支管理**: [18-Git分支管理](./18-git-branch-management.md)
+- **分支管理**: [19-Git分支管理](./18-git-branch-management.md)
   - 分支策略、合并流程
-- **代码审查**: [19-代码审查规范](./19-code-review-standards.md)
+- **代码审查**: [20-代码审查规范](./19-code-review-standards.md)
   - PR模板、审查清单
 
 #### ⚡ 性能优化
-- **Vue性能**: [20-Vue性能优化](./20-vue-performance-optimization.md)
+- **Vue性能**: [21-Vue性能优化](./20-vue-performance-optimization.md)
   - 组件优化、懒加载、内存管理
-- **构建优化**: [21-构建优化](./21-build-optimization.md)
+- **构建优化**: [22-构建优化](./21-build-optimization.md)
   - 代码分割、压缩、缓存
 
 #### 🧪 测试规范
-- **单元测试**: [22-单元测试规范](./22-unit-testing-standards.md)
+- **单元测试**: [23-单元测试规范](./22-unit-testing-standards.md)
   - 组件测试、工具函数测试
-- **集成测试**: [23-集成测试规范](./23-integration-testing-standards.md)
+- **集成测试**: [24-集成测试规范](./23-integration-testing-standards.md)
   - E2E测试、API测试
 
 #### 🛡️ 质量保证
-- **错误处理**: [24-错误处理日志](./24-error-handling-logging.md)
+- **错误处理**: [25-错误处理日志](./24-error-handling-logging.md)
   - 全局错误处理、日志规范
-- **质量清单**: [25-代码质量清单](./25-code-quality-checklist.md)
+- **质量清单**: [26-代码质量清单](./25-code-quality-checklist.md)
   - 检查项目、评估标准
 
 ---
@@ -83,7 +85,7 @@
 2. [QUICK_START.md](./QUICK_START.md) - 5分钟快速设置
 3. [01-项目结构规范](./01-project-structure.md) - 了解项目组织
 4. [02-Vue组件结构](./02-vue-component-structure.md) - 学习组件开发
-5. [10-ESLint配置](./10-eslint-configuration.md) - 配置代码检查
+5. [11-ESLint配置](./10-eslint-configuration.md) - 配置代码检查
 
 ### 配置文件快速查找
 - **ESLint 9配置**: [eslint.config.js模板](./10-eslint-configuration.md#eslintconfigjs-配置模板-vue官方推荐)
